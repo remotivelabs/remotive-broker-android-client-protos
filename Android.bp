@@ -2,20 +2,32 @@
  * Copyright 2023 Volvo Car Corporation
 */
 
+filegroup {
+    name: "google_api_protos",
+    srcs: [
+        "protos/google/api/annotations.proto",
+        "protos/google/api/http.proto",
+    ],
+}
+
 genrule {
     name: "network_api_proto_h",
     tools: [
         "aprotoc",
         "protoc-gen-grpc-cpp-plugin",
     ],
-    cmd: "$(location aprotoc) -I$$(dirname $(location protos/network_api.proto)) -Iexternal/protobuf/src --plugin=protoc-gen-grpc=$(location protoc-gen-grpc-cpp-plugin) $(in) --grpc_out=$(genDir) --cpp_out=$(genDir)",
+    cmd: "$(location aprotoc) -I$$(dirname $(location protos/network_api.proto))  -Iexternal/protobuf/src --plugin=protoc-gen-grpc=$(location protoc-gen-grpc-cpp-plugin) $(in) --grpc_out=$(genDir) --cpp_out=$(genDir)",
     srcs: [
         "protos/network_api.proto",
         "protos/common.proto",
+        ":google_api_protos",
+        ":libprotobuf-internal-protos",
     ],
     out: [
         "network_api.grpc.pb.h",
         "network_api.pb.h",
+        "google/api/annotations.pb.h",
+        "google/api/http.pb.h",
     ],
 }
 
@@ -29,10 +41,14 @@ genrule {
     srcs: [
         "protos/network_api.proto",
         "protos/common.proto",
+        ":google_api_protos",
+        ":libprotobuf-internal-protos",
     ],
     out: [
         "network_api.grpc.pb.cc",
         "network_api.pb.cc",
+        "google/api/annotations.pb.cc",
+        "google/api/http.pb.cc",
     ],
 }
 
@@ -45,6 +61,7 @@ genrule {
     cmd: "$(location aprotoc) -I$$(dirname $(location protos/common.proto)) -Iexternal/protobuf/src --plugin=protoc-gen-grpc=$(location protoc-gen-grpc-cpp-plugin) $(in) --grpc_out=$(genDir) --cpp_out=$(genDir)",
     srcs: [
         "protos/common.proto",
+        ":libprotobuf-internal-protos",
     ],
     out: [
         "common.grpc.pb.h",
@@ -61,6 +78,7 @@ genrule {
     cmd: "$(location aprotoc) -I$$(dirname $(location protos/common.proto)) -Iexternal/protobuf/src --plugin=protoc-gen-grpc=$(location protoc-gen-grpc-cpp-plugin) $(in) --grpc_out=$(genDir) --cpp_out=$(genDir)",
     srcs: [
         "protos/common.proto",
+        ":libprotobuf-internal-protos",
     ],
     out: [
         "common.grpc.pb.cc",
@@ -78,6 +96,8 @@ genrule {
     srcs: [
         "protos/system_api.proto",
         "protos/common.proto",
+        ":google_api_protos",
+        ":libprotobuf-internal-protos",
     ],
     out: [
         "system_api.grpc.pb.h",
@@ -95,6 +115,8 @@ genrule {
     srcs: [
         "protos/system_api.proto",
         "protos/common.proto",
+        ":google_api_protos",
+        ":libprotobuf-internal-protos",
     ],
     out: [
         "system_api.grpc.pb.cc",
@@ -102,8 +124,9 @@ genrule {
     ],
 }
 
+
 cc_library {
-    name: "libsignalbroker",
+    name: "remotivelabs-grpc-lib",
     vendor: true,
     vendor_available: false,
 
